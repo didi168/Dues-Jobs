@@ -1,0 +1,91 @@
+:root {
+  /* Supabase Inspired Colors (Dark Mode First approach) */
+  /* Base - Slate / Dark Grays */
+  --bg-body: #121212;       /* Very dark base */
+  --bg-card: #1c1c1c;       /* Slightly lighter for cards */
+  --bg-hover: #2a2a2a;      /* Hover states */
+  
+  /* Primary - Emerald Green */
+  --primary: #3ECF8E;       /* Supabase Green */
+  --primary-hover: #34b27b; 
+  --primary-text: #000000;  /* Text on primary buttons */
+
+  /* Text */
+  --text-main: #EDEDED;
+  --text-muted: #888888;
+  
+  /* Borders */
+  --border: #333333;
+  
+  /* Utilities */
+  --success: #3ECF8E;
+  --danger: #cf3e3e;
+  --warning: #f59e0b;
+
+  /* Spacing & Radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  
+  /* Font */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Light Mode Overrides (Optional - keeping mostly dark for "Developer Tool" feel) */
+/* We will stick to Dark Mode by default as per 'Supabase' aesthetic request usually implies their dark UI */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Typography Overrides */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-main);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+/* Element Resets */
+button {
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+a:hover {
+  text-decoration: underline;
+  opacity: 0.9;
+}
+
+/* Input Styling */
+input, select, textarea {
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.8rem;
+  background: #111; /* Darker than card */
+  color: var(--text-main);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary); /* Focus ring */
+}

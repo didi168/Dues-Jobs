@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: dues-jobs-server
+    env: node
+    buildCommand: yarn install
+    startCommand: yarn start
+    envVars:
+      - key: DATE
+        value: 2024
+      - key: NODE_ENV
+        value: production
+    healthCheckPath: /health
+
+  - type: cron
+    name: daily-fetch-job
+    env: node
+    schedule: "0 9 * * *" # Runs every day at 9 AM
+    buildCommand: yarn install
+    startCommand: node scripts/run-daily-fetch.js
+    envVars:
+      - key: CRON_JOB
+        value: true
