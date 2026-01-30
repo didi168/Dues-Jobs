@@ -2,8 +2,8 @@ import PreferencesForm from '../components/settings/PreferencesForm';
 
 export default function Settings() {
   return (
-    <div className="container" style={{ maxWidth: '800px' }}>
-       <h1 style={{ marginBottom: '2rem' }}>Settings</h1>
+    <div style={{ maxWidth: '700px' }}>
+       <h1 style={{ marginBottom: '2rem', fontSize: '1.5rem' }}>Account Settings</h1>
        <PreferencesForm />
     </div>
   );

@@ -1,0 +1,101 @@
+/* Global Layout */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 280px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--glass-border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+  padding: 2rem 1.25rem;
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.05);
+  transition: var(--transition);
+}
+
+.sidebar-logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  padding: 0 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem;
+  margin-bottom: 0.5rem;
+  border-radius: var(--radius-pill);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.nav-link:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+  transform: translateX(4px);
+}
+
+.nav-link.active {
+  background: var(--brand);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(62, 207, 142, 0.3);
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  margin-left: 280px; 
+  padding: 3rem;
+  max-width: 1400px;
+  min-height: 100vh;
+}
+
+/* Topbar Mobile Specifics */
+.mobile-header {
+  display: none;
+  padding: 1rem;
+  background: var(--bg-body);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  .sidebar { 
+    transform: translateX(-100%); 
+    transition: transform 0.3s ease;
+  }
+  .sidebar.open { transform: translateX(0); }
+  
+  .main-content { margin-left: 0; padding: 1rem; }
+  .mobile-header { display: flex; justify-content: space-between; align-items: center; }
+  
+  /* Overlay */
+  .sidebar-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 45;
+  }
+}

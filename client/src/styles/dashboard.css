@@ -1,0 +1,89 @@
+/* Dashboard Banner */
+.dashboard-banner {
+  background: var(--gradient-base);
+  border: 1px solid var(--border);
+  margin-bottom: 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.banner-content h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.04em;
+}
+
+.banner-actions {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--bg-input);
+  padding: 6px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+}
+
+.btn-filter {
+  font-size: 0.85rem;
+  padding: 6px 18px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-pill);
+  transition: var(--transition);
+}
+
+.btn-filter.active {
+  background: var(--bg-card);
+  color: var(--brand);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.btn-refresh {
+  background: var(--bg-card);
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-refresh:hover {
+  transform: rotate(15deg) scale(1.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dashboard-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .banner-actions {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .filter-group {
+    width: 100%;
+    justify-content: space-between;
+    overflow-x: auto; /* Scroll if needed on very small screens */
+  }
+
+  .btn-filter {
+    flex: 1; /* Distribute space evenly */
+    text-align: center;
+  }
+}

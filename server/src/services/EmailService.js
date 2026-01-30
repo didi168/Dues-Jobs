@@ -16,7 +16,7 @@ class EmailService {
     if (!email || jobs.length === 0) return;
 
     const jobRows = jobs.map(j => 
-      `<li><a href="${j.source_url}"><b>${j.title}</b></a> at ${j.company} (${j.location || 'Remote'})</li>`
+      `<li><a href="${j.apply_url}"><b>${j.title}</b></a> at ${j.company} (${j.location || 'Remote'})</li>`
     ).join('');
 
     const html = `
@@ -27,7 +27,7 @@ class EmailService {
     `;
 
     const text = `Daily Job Summary\n\nFound ${jobs.length} new jobs:\n` + 
-      jobs.map(j => `- ${j.title} at ${j.company} (${j.source_url})`).join('\n');
+      jobs.map(j => `- ${j.title} at ${j.company} (${j.apply_url})`).join('\n');
 
     try {
       const info = await this.transporter.sendMail({

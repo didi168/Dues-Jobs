@@ -7,8 +7,10 @@ class JobNormalizer {
       company,
       location,
       is_remote,
+      job_type,
       source,
-      source_url,
+      source_url, // API returns this
+      apply_url,  // Or this
       posted_at,
       description,
       salary,
@@ -20,17 +22,17 @@ class JobNormalizer {
     const normalizedLocation = is_remote ? 'Remote' : (location ? location.trim() : 'Unknown Location');
 
     // Create a canonical string for hashing using key attributes
-    // Lowercase to ensure case-insensitivity in deduplication
     const canonicalString = `${normalizedTitle.toLowerCase()}|${normalizedCompany.toLowerCase()}|${normalizedLocation.toLowerCase()}`;
     const canonicalHash = createHash(canonicalString);
 
     return {
       title: normalizedTitle,
       company: normalizedCompany,
-      location: location ? location.trim() : null, // Keep original location field
+      location: location ? location.trim() : null,
       is_remote: !!is_remote,
+      job_type: job_type || (is_remote ? 'Remote' : 'Onsite'),
       source: source || 'Unknown',
-      source_url: source_url,
+      apply_url: apply_url || source_url, // Final normalized field
       posted_at: posted_at ? new Date(posted_at).toISOString() : new Date().toISOString(),
       description: description ? description.trim() : '',
       salary: salary ? salary.toString().trim() : null,

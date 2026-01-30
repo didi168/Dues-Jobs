@@ -15,7 +15,7 @@ class TelegramService {
     if (!chatId || jobs.length === 0) return;
 
     const message = `📢 *Daily Job Summary*\nFound ${jobs.length} new jobs:\n\n` +
-      jobs.map(j => `• [${j.title}](${j.source_url}) at ${j.company}`).slice(0, 10).join('\n') +
+      jobs.map(j => `• [${j.title}](${j.apply_url}) at ${j.company}`).slice(0, 10).join('\n') +
       (jobs.length > 10 ? `\n\n...and ${jobs.length - 10} more.` : '');
 
     try {

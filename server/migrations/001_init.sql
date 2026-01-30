@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS user_preferences (
   keywords TEXT[] DEFAULT '{}',
   locations TEXT[] DEFAULT '{}',
   remote_only BOOLEAN DEFAULT FALSE,
-  sources TEXT[] DEFAULT '{}',
+  sources TEXT[] DEFAULT '{"Adzuna", "Remotive", "RemoteOK"}',
   email_enabled BOOLEAN DEFAULT TRUE,
   telegram_enabled BOOLEAN DEFAULT FALSE,
   telegram_chat_id TEXT,
@@ -24,8 +24,9 @@ CREATE TABLE IF NOT EXISTS jobs (
   company TEXT NOT NULL,
   location TEXT,
   is_remote BOOLEAN DEFAULT FALSE,
+  job_type TEXT, -- Added job_type
   source TEXT NOT NULL,
-  source_url TEXT NOT NULL,
+  apply_url TEXT NOT NULL, -- Renamed from source_url
   posted_at TIMESTAMPTZ,
   description TEXT,
   salary TEXT,
@@ -41,6 +42,7 @@ CREATE TABLE IF NOT EXISTS user_jobs (
   status TEXT CHECK (status IN ('new', 'applied', 'ignored')) DEFAULT 'new',
   notes TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, job_id)
 );
 
@@ -50,6 +52,7 @@ CREATE TABLE IF NOT EXISTS fetch_logs (
   status TEXT CHECK (status IN ('running', 'success', 'error')),
   jobs_fetched INTEGER DEFAULT 0,
   jobs_inserted INTEGER DEFAULT 0,
+  sources TEXT[] DEFAULT '{}',
   details TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   completed_at TIMESTAMPTZ

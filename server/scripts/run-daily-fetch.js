@@ -27,6 +27,15 @@ async function runDailyFetch() {
     // 2. Normalize
     const normalizedJobs = allRawJobs.map(JobNormalizer.normalize);
 
+    // 2.1 Enforce 72-hour window
+    const cutoffDate = new Date(Date.now() - (72 * 60 * 60 * 1000));
+    const recentJobs = normalizedJobs.filter(job => {
+      const posted = new Date(job.posted_at);
+      return posted >= cutoffDate;
+    });
+
+    console.log(`[Cron] Normalized ${normalizedJobs.length} jobs. Keeping ${recentJobs.length} recent (last 3 days).`);
+
     // 3. Deduplicate (In-memory for batch) & Insert
     // Note: Database handles dedup via canonical_hash UNIQUE constraint.
     // We just try to insert all avoiding duplicates.
@@ -37,7 +46,7 @@ async function runDailyFetch() {
     
     const { data: insertedJobs, error: insertError } = await supabaseAdmin
       .from('jobs')
-      .upsert(normalizedJobs, { 
+      .upsert(recentJobs, { 
         onConflict: 'canonical_hash', 
         ignoreDuplicates: true 
       })
@@ -130,6 +139,7 @@ async function runDailyFetch() {
       status: 'success',
       jobs_fetched: allRawJobs.length,
       jobs_inserted: newJobs.length,
+      sources: fetchers.map(f => f.sourceName),
       completed_at: new Date().toISOString()
     });
 

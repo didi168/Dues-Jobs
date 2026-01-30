@@ -1,91 +1,144 @@
 :root {
-  /* Supabase Inspired Colors (Dark Mode First approach) */
-  /* Base - Slate / Dark Grays */
-  --bg-body: #121212;       /* Very dark base */
-  --bg-card: #1c1c1c;       /* Slightly lighter for cards */
-  --bg-hover: #2a2a2a;      /* Hover states */
+  /* Common Defaults */
+  --brand: #3ecf8e;
+  --brand-hover: #34b27b;
+  --brand-soft: rgba(62, 207, 142, 0.1);
   
-  /* Primary - Emerald Green */
-  --primary: #3ECF8E;       /* Supabase Green */
-  --primary-hover: #34b27b; 
-  --primary-text: #000000;  /* Text on primary buttons */
-
-  /* Text */
-  --text-main: #EDEDED;
-  --text-muted: #888888;
-  
-  /* Borders */
-  --border: #333333;
-  
-  /* Utilities */
-  --success: #3ECF8E;
-  --danger: #cf3e3e;
-  --warning: #f59e0b;
-
-  /* Spacing & Radius */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  
-  /* Font */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 9999px;
+
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Light Mode Overrides (Optional - keeping mostly dark for "Developer Tool" feel) */
-/* We will stick to Dark Mode by default as per 'Supabase' aesthetic request usually implies their dark UI */
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* Light Theme */
+[data-theme="light"] {
+  --bg-body: #f5f7f9;
+  --bg-card: #ffffff;
+  --bg-sidebar: #ffffff;
+  --bg-input: #f0f2f5;
+  --bg-hover: #f3f4f6;
+  
+  --text-primary: #1a1a1a;
+  --text-secondary: #4b5563;
+  --text-muted: #8d97a5;
+  
+  --border: rgba(0, 0, 0, 0.05);
+  --border-strong: rgba(0, 0, 0, 0.1);
+  
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  
+  --gradient-base: linear-gradient(135deg, #ffffff 0%, #f5f7f9 100%);
 }
+
+/* Dark Theme (Philtechs Style - Deep & Soft) */
+[data-theme="dark"] {
+  --bg-body: #0d1117; 
+  --bg-card: #161b22;
+  --bg-sidebar: #0d1117;
+  --bg-input: #0d1117;
+  --bg-hover: #21262d;
+  
+  --text-primary: #f0f6fc;
+  --text-secondary: #8b949e;
+  --text-muted: #484f58;
+  
+  --border: rgba(240, 246, 252, 0.1);
+  --border-strong: rgba(240, 246, 252, 0.15);
+  
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+  --glass-bg: rgba(22, 27, 34, 0.7);
+  --glass-border: rgba(240, 246, 252, 0.1);
+
+  --gradient-base: radial-gradient(circle at top left, #161b22, #0d1117);
+}
+
+/* Reset & Base */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--bg-body);
-  color: var(--text-main);
-  line-height: 1.5;
+  background: var(--bg-body);
+  color: var(--text-primary);
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  transition: var(--transition);
 }
 
-/* Typography Overrides */
-h1, h2, h3, h4, h5, h6 {
-  color: var(--text-main);
+h1, h2, h3, h4 { 
+  color: var(--text-primary); 
+  font-weight: 700; 
+  letter-spacing: -0.03em; 
+}
+
+a { 
+  color: var(--brand); 
+  text-decoration: none; 
+  transition: var(--transition); 
+}
+
+a:hover { 
+  color: var(--brand-hover); 
+}
+
+/* Global Button Base */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-pill);
   font-weight: 600;
-  letter-spacing: -0.025em;
-}
-
-/* Element Resets */
-button {
-  cursor: pointer;
-  font-family: inherit;
   font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  transition: var(--transition);
+  white-space: nowrap;
 }
 
-a {
-  color: var(--primary);
-  text-decoration: none;
-  font-weight: 500;
-  transition: opacity 0.2s;
-}
-a:hover {
-  text-decoration: underline;
-  opacity: 0.9;
+.btn-primary {
+  background: var(--brand);
+  color: #ffffff;
+  box-shadow: 0 4px 14px 0 rgba(62, 207, 142, 0.39);
 }
 
-/* Input Styling */
-input, select, textarea {
-  font-family: inherit;
+.btn-primary:hover {
+  background: var(--brand-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(62, 207, 142, 0.45);
+}
+
+.btn-secondary {
+  background: var(--bg-input);
+  color: var(--text-secondary);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 0.6rem 0.8rem;
-  background: #111; /* Darker than card */
-  color: var(--text-main);
-  outline: none;
-  transition: border-color 0.2s;
 }
 
-input:focus, select:focus, textarea:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 1px var(--primary); /* Focus ring */
+.btn-secondary:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+/* Scrollbar Polish */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { 
+  background: var(--border-strong); 
+  border-radius: 10px; 
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Glass Effect Utility */
+.glass {
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border) !important;
 }

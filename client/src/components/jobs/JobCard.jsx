@@ -1,116 +1,97 @@
 import { useState } from 'react';
-import { ExternalLink, ThumbsUp, ThumbsDown, Clock, MapPin, Building2 } from 'lucide-react';
+import { ExternalLink, Clock, MapPin, Building2 } from 'lucide-react';
 import { apiRequest } from '../../services/api';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function JobCard({ job, onUpdate }) {
   const [loading, setLoading] = useState(false);
+  const [selectedAction, setSelectedAction] = useState(null); // 'applied' or 'ignored'
 
   const handleAction = async (status) => {
+    if (selectedAction) return; // Prevent double click
+    
+    setSelectedAction(status);
     setLoading(true);
+    
     try {
       await apiRequest(`/api/v1/jobs/${job.id}/mark`, {
         method: 'POST',
         body: JSON.stringify({ status })
       });
-      onUpdate(job.id, status);
+      
+      // Delay removal to show active state
+      setTimeout(() => {
+        onUpdate(job.id, status);
+      }, 800);
     } catch (err) {
       console.error('Failed to update job', err);
-      // alert('Failed to update job status'); // Silent fail better for UI? Or stick to simple alert.
+      setSelectedAction(null); // Reset on error
     } finally {
       setLoading(false);
     }
   };
 
+  const getButtonStyle = (status) => {
+    if (selectedAction === null) return {};
+    if (selectedAction === status) {
+        return status === 'applied' 
+            ? { backgroundColor: '#10b981', transform: 'scale(1.05)', boxShadow: '0 0 10px rgba(16, 185, 129, 0.4)' }
+            : { backgroundColor: '#6b7280', transform: 'scale(1.05)', boxShadow: '0 0 10px rgba(107, 114, 128, 0.4)' };
+    }
+    return { opacity: 0.5, filter: 'grayscale(1)' };
+  };
+
   return (
-    <div className="card" style={{ 
-      marginBottom: '1rem', 
-      padding: '1.25rem',
-      backgroundColor: 'var(--bg-card)',
-      transition: 'transform 0.2s, box-shadow 0.2s',
-      ':hover': { transform: 'translateY(-2px)' } // Inline hover pseudo doesn't work in React style prop, needs CSS class or styled-components. Keeping simple.
-    }}>
-      {/* Header */}
-      <div className="flex justify-between items-start gap-4" style={{ marginBottom: '0.75rem' }}>
+    <div className="card" style={selectedAction ? { opacity: 0.8 } : {}}>
+      <div className="card-header flex justify-between items-start">
         <div>
-           <h3 style={{ margin: 0, fontSize: '1.1rem', lineHeight: 1.3 }}>
-             <a href={job.source_url} target="_blank" rel="noreferrer" style={{ color: 'var(--text-main)', textDecoration: 'none' }}>
-               {job.title}
-             </a>
-           </h3>
-           <div className="flex items-center gap-2 text-sm text-muted" style={{ marginTop: '0.25rem' }}>
-             <span className="flex items-center gap-1"><Building2 size={12} /> {job.company}</span>
+           <div className="card-title">{job.title}</div>
+           <div className="text-xs text-muted flex items-center gap-2">
+              <Building2 size={13} /> {job.company}
            </div>
         </div>
         
         {job.is_remote ? (
-           <span style={{ 
-             background: 'rgba(62, 207, 142, 0.1)', 
-             color: 'var(--primary)', 
-             padding: '2px 8px', 
-             borderRadius: '12px', 
-             fontSize: '0.75rem', 
-             fontWeight: 600,
-             border: '1px solid rgba(62, 207, 142, 0.2)'
-           }}>
-             Remote
-           </span>
+           <span className="badge badge-green">Remote</span>
         ) : (
-           <span className="flex items-center gap-1 text-sm text-muted">
+           <span className="text-xs text-muted flex items-center gap-1">
              <MapPin size={12} /> {job.location}
            </span>
         )}
       </div>
 
-      {/* Meta */}
-      <div className="flex items-center gap-4 text-xs text-muted" style={{ marginBottom: '1.25rem', paddingTop: '0.5rem', borderTop: '1px solid #333' }}>
-        <span className="flex items-center gap-1" title="Posted">
-          <Clock size={12} /> {formatDistanceToNow(new Date(job.posted_at), { addSuffix: true })}
-        </span>
-        <span>•</span>
-        <span style={{ textTransform: 'capitalize' }}>Source: {job.source}</span>
+      <div className="text-sm text-secondary" style={{ marginBottom: '1rem', lineHeight: '1.4' }}>
+         This is a job snippet placeholder. The actual job description would be parsed or truncated here to give a quick preview.
       </div>
 
-      {/* Actions */}
-      <div style={{ display: 'flex', gap: '0.75rem' }}>
-        <a 
-          href={job.source_url} 
-          target="_blank" 
-          rel="noreferrer" 
-          className="btn btn-outline"
-          style={{ 
-            flex: 1, 
-            fontSize: '0.85rem', 
-            borderColor: 'var(--border)', 
-            color: 'var(--text-main)' 
-          }}
-        >
-          <ExternalLink size={14} /> Full Details
+      <div className="flex items-center gap-3 text-xs text-muted" style={{ marginBottom: '1rem' }}>
+         <span>{formatDistanceToNow(new Date(job.posted_at), { addSuffix: true })}</span>
+         <span>•</span>
+         <span>{job.source}</span>
+      </div>
+
+      <div className="flex gap-2">
+        <a href={job.apply_url} target="_blank" rel="noreferrer" className="btn btn-secondary">
+          <ExternalLink size={14} /> Details
         </a>
-        
+
         {job.status === 'new' && (
           <>
             <button 
-              className="btn btn-primary" 
-              onClick={() => handleAction('applied')}
+              onClick={() => handleAction('applied')} 
+              className={`btn btn-primary ${selectedAction === 'applied' ? 'active' : ''}`}
+              style={{ minWidth: '80px', transition: 'all 0.2s', ...getButtonStyle('applied') }}
               disabled={loading}
-              title="Mark as Applied"
-              style={{ padding: '0.5rem 0.8rem' }}
             >
-              <ThumbsUp size={16} />
+              {selectedAction === 'applied' ? 'Applied!' : 'Applied'}
             </button>
             <button 
-              className="btn btn-outline" 
-              onClick={() => handleAction('ignored')}
+              onClick={() => handleAction('ignored')} 
+              className={`btn btn-secondary ${selectedAction === 'ignored' ? 'active' : ''}`}
+              style={{ minWidth: '80px', transition: 'all 0.2s', ...getButtonStyle('ignored') }}
               disabled={loading}
-              title="Ignore Job"
-              style={{ 
-                color: 'var(--text-muted)', 
-                borderColor: 'var(--border)',
-                padding: '0.5rem 0.8rem'
-              }}
             >
-              <ThumbsDown size={16} />
+               {selectedAction === 'ignored' ? 'Ignored!' : 'Ignored'}
             </button>
           </>
         )}

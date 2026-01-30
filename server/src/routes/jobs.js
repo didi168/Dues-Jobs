@@ -12,7 +12,7 @@ router.use(authenticateUser);
  * Query params: status, source, keyword, page, limit
  */
 router.get('/', async (req, res) => {
-  const { status, source, keyword, page = 1, limit = 20 } = req.query;
+  const { status, source, keyword, page = 1, limit = 20, days } = req.query;
   const offset = (page - 1) * limit;
 
   try {
@@ -22,6 +22,13 @@ router.get('/', async (req, res) => {
       .from('user_jobs')
       .select('*, job:jobs(*)')
       .eq('user_id', req.user.id);
+
+    if (days && !isNaN(parseInt(days))) {
+      const msPerDay = 24 * 60 * 60 * 1000;
+      const daysCount = parseInt(days);
+      const cutoffDate = new Date(Date.now() - (daysCount * msPerDay));
+      query = query.gte('created_at', cutoffDate.toISOString());
+    }
 
     if (status) {
       query = query.eq('status', status);
@@ -60,7 +67,12 @@ router.get('/', async (req, res) => {
 
   } catch (err) {
     console.error('Get Jobs Error:', err);
-    res.status(500).json({ error: 'Failed to fetch jobs' });
+    res.status(500).json({ 
+      error: 'Failed to fetch jobs', 
+      details: err.message || err,
+      fullError: err,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
   }
 });
 
@@ -82,7 +94,7 @@ router.post('/:job_id/mark', async (req, res) => {
   try {
     const { data, error } = await supabaseAdmin
       .from('user_jobs')
-      .update({ status, notes, updated_at: new Date() }) // If we had updated_at
+      .update({ status, notes })
       .eq('user_id', req.user.id)
       .eq('job_id', job_id)
       .select();

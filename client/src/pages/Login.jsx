@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthProvider';
 import { useNavigate, Link } from 'react-router-dom';
+import { Briefcase } from 'lucide-react';
 
 export default function Login() {
   const { signIn, signUp } = useAuth();
@@ -36,33 +37,52 @@ export default function Login() {
   };
 
   return (
-    <div className="container" style={{ maxWidth: '400px', marginTop: '4rem' }}>
-      <div className="card">
-        <h1 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
-          {isLogin ? 'Login to Dues Jobs' : 'Create Account'}
-        </h1>
+    <div style={{ 
+      minHeight: '100vh', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center', 
+      background: 'var(--bg-body)',
+      backgroundImage: 'radial-gradient(circle at 10% 20%, rgba(62, 207, 142, 0.05) 0%, transparent 20%), radial-gradient(circle at 90% 80%, rgba(62, 207, 142, 0.05) 0%, transparent 20%)'
+    }}>
+      <div className="card" style={{ width: '100%', maxWidth: '420px', padding: '2.5rem', boxShadow: 'var(--shadow-md)', border: '1px solid var(--border)' }}>
         
-        {error && <div style={{ color: 'var(--danger)', marginBottom: '1rem' }}>{error}</div>}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+           <div style={{ background: 'rgba(62, 207, 142, 0.1)', padding: '12px', borderRadius: '16px' }}>
+              <Briefcase size={32} color="var(--brand)" />
+           </div>
+        </div>
+
+        <h1 style={{ marginBottom: '0.5rem', textAlign: 'center', fontSize: '1.75rem' }}>
+          {isLogin ? 'Welcome Back' : 'Create Account'}
+        </h1>
+        <p className="text-muted text-sm" style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          {isLogin ? 'Sign in to access your dashboard' : 'Join DuesJobs to find your next role'}
+        </p>
+        
+        {error && <div className="text-danger" style={{ marginBottom: '1rem', fontSize: '0.9rem', textAlign: 'center' }}>{error}</div>}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>Email</label>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label">Email Address</label>
             <input 
               type="email" 
+              className="form-input"
               value={email} 
               onChange={e => setEmail(e.target.value)} 
               required 
-              style={{ width: '100%' }}
+              placeholder="you@example.com"
             />
           </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem' }}>Password</label>
+          <div className="form-group" style={{ marginBottom: '0.5rem' }}>
+            <label className="form-label">Password</label>
             <input 
               type="password" 
+              className="form-input"
               value={password} 
               onChange={e => setPassword(e.target.value)} 
               required 
-              style={{ width: '100%' }}
+              placeholder="••••••••"
             />
           </div>
 
@@ -70,22 +90,24 @@ export default function Login() {
             type="submit" 
             className="btn btn-primary" 
             disabled={loading}
-            style={{ width: '100%' }}
+            style={{ width: '100%', marginTop: '1rem' }}
           >
-            {loading ? 'Processing...' : (isLogin ? 'Login' : 'Sign Up')}
+            {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Sign Up')}
           </button>
         </form>
 
-        <p style={{ textAlign: 'center', marginTop: '1rem', color: 'var(--text-muted)' }}>
-          {isLogin ? "Don't have an account? " : "Already have an account? "}
+        <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
+          <span className="text-muted text-sm">
+            {isLogin ? "Don't have an account? " : "Already have an account? "}
+          </span>
           <button 
-            className="btn-outline" 
-            style={{ border: 'none', padding: 0, color: 'var(--primary)', textDecoration: 'underline' }}
+            className="btn-ghost"
+            style={{ padding: '0 0.25rem', color: 'var(--text-primary)' }}
             onClick={() => setIsLogin(!isLogin)}
           >
-            {isLogin ? 'Sign Up' : 'Login'}
+            {isLogin ? 'Sign Up' : 'Sign In'}
           </button>
-        </p>
+        </div>
       </div>
     </div>
   );

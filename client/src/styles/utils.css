@@ -12,33 +12,25 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-md);
+  padding: 0.75rem 1.75rem;
+  border-radius: var(--radius-pill);
   border: 1px solid transparent;
-  font-weight: 500;
-  transition: all 0.2s;
+  font-weight: 700;
+  transition: var(--transition);
   text-decoration: none !important;
+  cursor: pointer;
 }
 
 .btn-primary {
-  background-color: var(--primary);
-  color: var(--primary-text);
-  border-color: var(--primary);
-}
-.btn-primary:hover {
-  background-color: var(--primary-hover);
-  border-color: var(--primary-hover);
+  background: var(--brand);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(62, 207, 142, 0.3);
 }
 
-.btn-outline {
-  background-color: transparent;
-  border-color: var(--border);
-  color: var(--text-muted);
-}
-.btn-outline:hover {
-  border-color: var(--text-main);
-  color: var(--text-main);
-  background-color: var(--bg-hover);
+.btn-primary:hover {
+  background: var(--brand-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(62, 207, 142, 0.4);
 }
 
 /* Cards */
@@ -47,7 +39,13 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg, 0 20px 40px rgba(0,0,0,0.1));
 }
 
 /* Flex Utilities */
