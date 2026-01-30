@@ -156,17 +156,49 @@ export default function PreferencesForm() {
         </div>
 
         {formData.telegram_enabled && (
-          <div className="form-group" style={{ marginTop: '1rem', padding: '1rem', background: 'var(--bg-body)', borderRadius: 'var(--radius-sm)' }}>
-             <label className="form-label">Telegram Chat ID</label>
-             <input
-               className="form-input"
-               value={formData.telegram_chat_id}
-               onChange={e => setFormData({ ...formData, telegram_chat_id: e.target.value })}
-               placeholder="12345678"
-             />
-             <div className="text-xs text-muted" style={{ marginTop: '0.5rem' }}>
-                Message <strong>@DuesJobsBot</strong> to get your ID.
+          <div className="form-group" style={{ marginTop: '1rem', padding: '1.5rem', background: 'var(--bg-body)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <span className="text-sm font-bold">
+                  Status: {formData.telegram_chat_id ? <span className="text-success">✅ Connected</span> : <span className="text-danger">❌ Not Linked</span>}
+                </span>
+                {formData.telegram_chat_id && (
+                  <button 
+                    type="button" 
+                    onClick={() => setFormData({ ...formData, telegram_chat_id: '', telegram_enabled: false })}
+                    className="text-xs" 
+                    style={{ color: '#ef4444', background: 'transparent', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                  >
+                    Disconnect
+                  </button>
+                )}
              </div>
+
+             <label className="form-label">Telegram Chat ID</label>
+             <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <input
+                  className="form-input"
+                  style={{ flex: 1 }}
+                  value={formData.telegram_chat_id}
+                  onChange={e => setFormData({ ...formData, telegram_chat_id: e.target.value })}
+                  placeholder="Paste your ID here"
+                />
+             </div>
+             
+             <div className="text-xs text-muted" style={{ marginTop: '1rem', lineHeight: '1.4' }}>
+                1. Click the button below to open our bot.<br/>
+                2. Send <b>/start</b> to get your personal Chat ID.<br/>
+                3. Paste the ID here and save your preferences.
+             </div>
+
+             <a 
+               href="https://t.me/dues_jobs_bot" 
+               target="_blank" 
+               rel="noreferrer" 
+               className="btn btn-secondary" 
+               style={{ marginTop: '1rem', width: '100%', fontSize: '0.8rem' }}
+             >
+                Connect Telegram 🤖
+             </a>
           </div>
         )}
       </div>

@@ -71,4 +71,60 @@ router.put('/me/preferences', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/v1/users/me/telegram
+ * Link Telegram Chat ID
+ */
+router.post('/me/telegram', async (req, res) => {
+  const { telegram_chat_id } = req.body;
+
+  if (!telegram_chat_id) {
+    return res.status(400).json({ error: 'Chat ID is required' });
+  }
+
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('user_preferences')
+      .update({ 
+        telegram_chat_id, 
+        telegram_enabled: true,
+        updated_at: new Date()
+      })
+      .eq('user_id', req.user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json(data);
+  } catch (err) {
+    console.error('Link Telegram Error:', err);
+    res.status(500).json({ error: 'Failed to link Telegram' });
+  }
+});
+
+/**
+ * DELETE /api/v1/users/me/telegram
+ * Disconnect Telegram
+ */
+router.delete('/me/telegram', async (req, res) => {
+  try {
+    const { data, error } = await supabaseAdmin
+      .from('user_preferences')
+      .update({ 
+        telegram_chat_id: null, 
+        telegram_enabled: false,
+        updated_at: new Date()
+      })
+      .eq('user_id', req.user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.json({ message: 'Telegram disconnected', data });
+  } catch (err) {
+    console.error('Disconnect Telegram Error:', err);
+    res.status(500).json({ error: 'Failed to disconnect Telegram' });
+  }
+});
+
 module.exports = router;
