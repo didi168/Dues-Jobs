@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+// Using native fetch available in Node.js 18+
 
 /**
  * TelegramBotHandler
