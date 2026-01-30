@@ -45,16 +45,17 @@ class TelegramBotHandler {
   }
 
   async handleMessage(message) {
-    const text = message.text ? message.text.toLowerCase() : '';
+    const text = (message.text || '').toLowerCase();
     const chatId = message.chat.id;
-    const firstName = message.from ? message.from.first_name : 'there';
+    const firstName = message.from ? message.from.first_name : 'User';
 
     let responseText = '';
 
     if (text === '/start') {
-      responseText = `👋 *Welcome to Dues Jobs, ${firstName}!*\n\nI'm here to help you get notified about new job opportunities.\n\nTo link your account:\n1️⃣ Copy your Chat ID below\n2️⃣ Paste it on the Dues Jobs website settings\n3️⃣ Click Save\n\n📌 *Your Chat ID:* \`${chatId}\``;
+      responseText = `👋 *Welcome to Dues Jobs, ${firstName}!*\n\nTo link your account and receive alerts:\n\n1️⃣ Copy your Chat ID: \`${chatId}\`\n2️⃣ Paste it on the Dues Jobs website settings\n3️⃣ Click Save\n\n📌 *Chat ID:* \`${chatId}\``;
     } else {
-      responseText = `🤖 *Dues Jobs Bot*\n\nYour message: _"${text || 'Media/None'}"_\n\nIf you need your Chat ID for the dashboard, here it is:\n\n📌 *Chat ID:* \`${chatId}\`\n\nType /start for more info.`;
+      // Direct response for any other message/interaction
+      responseText = `🤖 *Dues Jobs Chat ID Assistant*\n\nYour Chat ID is: \`${chatId}\`\n\n_Use this to link your account on the dashboard._`;
     }
     
     try {
