@@ -1,0 +1,14 @@
+{
+  "name": "dues-jobs-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:all": "yarn --cwd client install && yarn --cwd server install",
+    "dev": "npx concurrently \"yarn --cwd client dev\" \"yarn --cwd server dev\"",
+    "start": "npx concurrently \"yarn --cwd client start\" \"yarn --cwd server start\"",
+    "build:client": "yarn --cwd client build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

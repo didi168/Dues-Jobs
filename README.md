@@ -24,29 +24,36 @@ A full-stack SaaS application for finding and managing daily job opportunities. 
 ## 🏁 Getting Started
 
 ### Prerequisites
-- Node.js (v18+)
+
+- Node.js (v20+)
 - Yarn
 - Supabase Project
 
-### 1. Backend Setup
+### 1. Unified Development
+
+You can run both the frontend and backend simultaneously from the root directory:
 
 ```bash
-cd server
-yarn install
-# Create .env from .env.example and configure Supabase credentials
+# Install all dependencies
+yarn install:all
+
+# Run both in development mode
 yarn dev
 ```
-Runs on `http://localhost:5000`.
 
-### 2. Frontend Setup
+### 2. Environment Configuration
 
-```bash
-cd client
-yarn install
-# Create .env from .env.example
-yarn dev
-```
-Runs on `http://localhost:5173`.
+The project uses multiple environment files for different stages.
+
+- **Backend (`/server`)**: Uses `dev.env` (local) and `prod.env` (production). The server entry point (`app.js`) automatically selects the correct file based on `NODE_ENV`. For local development, ensure a `.env` file exists (e.g., `cp dev.env .env`).
+- **Frontend (`/client`)**: Uses `dev.env` and `prod.env`. For local development with Vite, ensure a `.env` file exists (e.g., `cp dev.env .env`).
+
+### 3. Scripts
+
+- `yarn install:all`: Installs dependencies for both workspace locations.
+- `yarn dev`: Starts the Vite dev server and the Express server concurrently.
+- `yarn build:client`: Builds the frontend for production.
 
 ## 📄 License
+
 [MIT](LICENSE)
