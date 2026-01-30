@@ -42,7 +42,7 @@ export default function Dashboard() {
           try {
              await apiRequest('/api/v1/fetch/run', { 
                  method: 'POST', 
-                 headers: { 'cron_secret': 'Chubunni2.' } // Hardcoded for demo, normally env or hidden
+                 headers: { 'cron_secret': import.meta.env.VITE_CRON_SECRET } 
              });
              alert("Fetch triggered. Refreshing jobs...");
              setTimeout(fetchJobs, 2000); // Wait a bit

@@ -19,7 +19,8 @@ export async function apiRequest(endpoint, options = {}) {
     ...options.headers,
   };
 
-  const response = await fetch(endpoint, {
+  const baseUrl = import.meta.env.VITE_BACKEND_URL || '';
+  const response = await fetch(`${baseUrl}${endpoint}`, {
     ...options,
     headers,
   });

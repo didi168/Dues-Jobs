@@ -9,7 +9,10 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || '*',
+  credentials: true
+}));
 app.use(morgan('dev'));
 app.use(express.json());
 
@@ -41,7 +44,8 @@ app.use((err, req, res, next) => {
 const telegramBot = require('./services/TelegramBotHandler');
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  const serverUrl = process.env.BACKEND_URL || `http://localhost:${PORT}`;
+  console.log(`Server running on ${serverUrl}`);
   telegramBot.start();
 });
 

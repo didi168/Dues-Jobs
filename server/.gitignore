@@ -4,11 +4,14 @@ pnpm-lock.yaml
 yarn-error.log
 
 # Environment variables
+*.env
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+dev.env
+prod.env
 
 # Logs
 logs
