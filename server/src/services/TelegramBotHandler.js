@@ -45,25 +45,30 @@ class TelegramBotHandler {
   }
 
   async handleMessage(message) {
-    const text = message.text.toLowerCase();
+    const text = message.text ? message.text.toLowerCase() : '';
     const chatId = message.chat.id;
+    const firstName = message.from ? message.from.first_name : 'there';
 
-    if (text === '/start' || text.includes('get id')) {
-      const responseText = `👋 *Welcome to Dues Jobs!*\n\nTo receive job alerts:\n1️⃣ Copy your Chat ID below\n2️⃣ Paste it on the Dues Jobs website\n3️⃣ Click Save\n\n📌 *Your Chat ID:* \`${chatId}\``;
-      
-      try {
-        await fetch(`${this.baseUrl}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: responseText,
-            parse_mode: 'Markdown',
-          }),
-        });
-      } catch (err) {
-        console.error('[TelegramBot] Error sending message:', err.message);
-      }
+    let responseText = '';
+
+    if (text === '/start') {
+      responseText = `👋 *Welcome to Dues Jobs, ${firstName}!*\n\nI'm here to help you get notified about new job opportunities.\n\nTo link your account:\n1️⃣ Copy your Chat ID below\n2️⃣ Paste it on the Dues Jobs website settings\n3️⃣ Click Save\n\n📌 *Your Chat ID:* \`${chatId}\``;
+    } else {
+      responseText = `🤖 *Dues Jobs Bot*\n\nYour message: _"${text || 'Media/None'}"_\n\nIf you need your Chat ID for the dashboard, here it is:\n\n📌 *Chat ID:* \`${chatId}\`\n\nType /start for more info.`;
+    }
+    
+    try {
+      await fetch(`${this.baseUrl}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: responseText,
+          parse_mode: 'Markdown',
+        }),
+      });
+    } catch (err) {
+      console.error('[TelegramBot] Error sending message:', err.message);
     }
   }
 
