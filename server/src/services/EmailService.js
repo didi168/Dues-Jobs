@@ -1,45 +1,52 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
 class EmailService {
   constructor() {
-    this.transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.ethereal.email',
-      port: process.env.SMTP_PORT || 587,
-      auth: {
-        user: process.env.SMTP_USER || 'ethereal_user',
-        pass: process.env.SMTP_PASS || 'ethereal_pass',
-      },
-    });
+    // We reuse SMTP_PASS if RESEND_API_KEY isn't set, as it contains the re_... key
+    const apiKey = process.env.RESEND_API_KEY || process.env.SMTP_PASS;
+    this.resend = new Resend(apiKey);
+    this.from = process.env.EMAIL_FROM || 'Dues Jobs <jobs@dues.com>';
   }
 
   async sendDailySummary(email, jobs) {
-    if (!email || jobs.length === 0) return;
-
-    const jobRows = jobs.map(j => 
-      `<li><a href="${j.apply_url}"><b>${j.title}</b></a> at ${j.company} (${j.location || 'Remote'})</li>`
-    ).join('');
+    if (!email || !jobs || jobs.length === 0) {
+      console.log(`[Email] Skipping send to ${email || 'unknown'}: no jobs or email provided.`);
+      return;
+    }
 
     const html = `
-      <h1>Daily Job Summary</h1>
-      <p>We found ${jobs.length} new jobs matching your preferences:</p>
-      <ul>${jobRows}</ul>
-      <p><small>Sent by Dues Jobs</small></p>
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <h1 style="color: #4f46e5;">Daily Job Summary</h1>
+        <p>Hi there! We found ${jobs.length} new jobs matching your preferences:</p>
+        <ul style="list-style: none; padding: 0;">
+          ${jobs.map(j => `
+            <li style="margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+              <a href="${j.apply_url}" style="text-decoration: none; color: #4f46e5; font-weight: bold; font-size: 1.1em;">${j.title}</a><br/>
+              <span style="color: #666;">at ${j.company} • ${j.location || 'Remote'}</span>
+            </li>
+          `).join('')}
+        </ul>
+        <div style="margin-top: 20px; font-size: 0.8em; color: #999; border-top: 2px solid #eee; padding-top: 10px;">
+          <p>Sent with ❤️ by Dues Jobs. Manage your alerts on your dashboard.</p>
+        </div>
+      </div>
     `;
 
-    const text = `Daily Job Summary\n\nFound ${jobs.length} new jobs:\n` + 
-      jobs.map(j => `- ${j.title} at ${j.company} (${j.apply_url})`).join('\n');
-
     try {
-      const info = await this.transporter.sendMail({
-        from: process.env.EMAIL_FROM,
+      const { data, error } = await this.resend.emails.send({
+        from: this.from,
         to: email,
         subject: `Your Daily Job Summary - ${jobs.length} New Jobs`,
-        text,
-        html,
+        html: html,
       });
-      console.log(`[Email] Sent to ${email}: ${info.messageId}`);
+
+      if (error) {
+        throw error;
+      }
+
+      console.log(`[Email] Sent successfully to ${email}. ID: ${data?.id}`);
     } catch (err) {
-      console.error(`[Email] Failed to send to ${email}`, err);
+      console.error(`[Email] Failed to send to ${email}:`, err.message || err);
     }
   }
 }

@@ -52,9 +52,10 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date() });
 });
 
-// 404 Handler
+// 404 Handler - Redirect to Frontend
 app.use((req, res, next) => {
-  res.status(404).json({ error: 'Not Found' });
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+  res.redirect(frontendUrl);
 });
 
 // Error Handler
@@ -62,6 +63,7 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Internal Server Error' });
 });
+
 
 const telegramBot = require('./services/TelegramBotHandler');
 

@@ -173,33 +173,34 @@ export default function PreferencesForm() {
                 )}
              </div>
 
-             <label className="form-label">Telegram Chat ID</label>
-             <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <input
-                  className="form-input"
-                  style={{ flex: 1 }}
-                  value={formData.telegram_chat_id}
-                  onChange={e => setFormData({ ...formData, telegram_chat_id: e.target.value })}
-                  placeholder="Paste your ID here"
-                />
-             </div>
-             
-             <div className="text-xs text-muted" style={{ marginTop: '1rem', lineHeight: '1.4' }}>
-                1. Click the button below to open our bot.<br/>
-                2. Send <b>/start</b> to get your personal Chat ID.<br/>
-                3. Paste the ID here and save your preferences.
-             </div>
-
              <a 
                href="https://t.me/dues_jobs_bot" 
                target="_blank" 
                rel="noreferrer" 
-               className="btn btn-secondary" 
-               style={{ marginTop: '1rem', width: '100%', fontSize: '0.8rem' }}
+               className="btn btn-primary" 
+               style={{ marginTop: '0.5rem', width: '100%', fontSize: '0.9rem', fontWeight: 'bold' }}
              >
                 Connect Telegram 🤖
              </a>
+
+             <div className="text-xs text-muted" style={{ marginTop: '1.5rem', marginBottom: '1rem', lineHeight: '1.4' }}>
+                1. Click the button above to open our bot.<br/>
+                2. Send <b>/start</b> to get your personal Chat ID.<br/>
+                3. Paste the ID below and save your preferences.
+             </div>
+
+             <label className="form-label">Telegram Chat ID</label>
+             <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <input
+                   className="form-input"
+                   style={{ flex: 1 }}
+                   value={formData.telegram_chat_id}
+                   onChange={e => setFormData({ ...formData, telegram_chat_id: e.target.value })}
+                   placeholder="Paste your ID here"
+                />
+             </div>
           </div>
+
         )}
       </div>
 

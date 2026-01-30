@@ -40,42 +40,32 @@ async function runDailyFetch() {
     // Note: Database handles dedup via canonical_hash UNIQUE constraint.
     // We just try to insert all avoiding duplicates.
     
-    // Supabase upsert/insert. 
-    // We want to skip duplicates. .upsert with ignoreDuplicates: true?
-    // Or insert, and let it fail? 'onConflict' is better.
-    
-    const { data: insertedJobs, error: insertError } = await supabaseAdmin
+    // 3. Insert and get all available recent jobs (including those already in DB)
+    const { error: insertError } = await supabaseAdmin
       .from('jobs')
       .upsert(recentJobs, { 
         onConflict: 'canonical_hash', 
         ignoreDuplicates: true 
-      })
-      .select();
+      });
 
     if (insertError) {
       throw new Error(`Insert failed: ${insertError.message}`);
     }
 
-    // "insertedJobs" might be null or empty if all were duplicates and we verified. 
-    // Wait, upsert with ignoreDuplicates: true returns null for ignored rows?
-    // We need to know which jobs are NEW to notify users.
-    // Strategy: 
-    // 1. Get all jobs created_at > startTime (minus safety buffer).
-    // Or better: filter 'normalizedJobs' by checking if they exist? No too slow.
-    // If we use 'insert' (not upsert) and ignore duplicates, we might get back generated IDs?
-    // Actually, simple way: fetch all jobs created_after startTime.
-    
-    const { data: newJobs, error: fetchError } = await supabaseAdmin
+    // Fetch all jobs that exist in our 72h window from the DB.
+    // This ensures we have the correct database IDs for all recent jobs.
+    const hashes = recentJobs.map(j => j.canonical_hash);
+    const { data: currentRecentJobs, error: fetchError } = await supabaseAdmin
       .from('jobs')
       .select('*')
-      .gt('created_at', startTime.toISOString());
+      .in('canonical_hash', hashes);
 
     if (fetchError) throw fetchError;
 
-    console.log(`[Cron] ${newJobs.length} new jobs inserted.`);
+    console.log(`[Cron] Total applicable jobs for matching: ${currentRecentJobs.length}`);
 
-    if (newJobs.length === 0) {
-      console.log('[Cron] No new jobs to process for users.');
+    if (currentRecentJobs.length === 0) {
+      console.log('[Cron] No jobs to process for users.');
       return; 
     }
 
@@ -83,39 +73,49 @@ async function runDailyFetch() {
     const { data: userPrefs, error: userError } = await supabaseAdmin
       .from('user_preferences')
       .select('*'); 
-      // Note: user_id is FK to auth.users. 
-      // We assume public.user_preferences 'user_id' -> auth.users 'id'.
-      // Supabase Join with auth schema is tricky. 
-      // Usually can't join across schemas easily in client unless views exist.
-      // We will perform match logic, then for notification we need email.
-      // We can use supabaseAdmin.auth.admin.getUserById(id) potentially if N is small.
-      // Or just assume we have email in preferences? No, prompt says "users (from Supabase Auth)".
-      // Let's assume we can't join easily. We'll iterate.
 
     if (userError) throw userError;
 
     console.log(`[Cron] Processing matches for ${userPrefs.length} users...`);
 
     for (const pref of userPrefs) {
-      const matchedJobs = JobMatcher.match(pref, newJobs);
+      // We now match against ALL recent jobs in the database
+      const matchedJobs = JobMatcher.match(pref, currentRecentJobs);
       
       if (matchedJobs.length > 0) {
-        // Create user_jobs
+        // Map to user_jobs records
         const userJobRecords = matchedJobs.map(job => ({
           user_id: pref.user_id,
           job_id: job.id,
           status: 'new'
         }));
 
-        const { error: ujError } = await supabaseAdmin
+        // Upsert with ignoreDuplicates to find ONLY the ones we just added
+        const { data: newlyAddedUserJobs, error: ujError } = await supabaseAdmin
           .from('user_jobs')
-          .upsert(userJobRecords, { onConflict: 'user_id,job_id', ignoreDuplicates: true });
+          .upsert(userJobRecords, { 
+            onConflict: 'user_id,job_id', 
+            ignoreDuplicates: true 
+          })
+          .select();
 
-        if (ujError) console.error(`[Cron] Error saving matches for user ${pref.user_id}`, ujError);
+        if (ujError) {
+          console.error(`[Cron] Error saving matches for user ${pref.user_id}`, ujError);
+          continue;
+        }
+
+        // Only notify about jobs that were JUST added to this user's list in this run
+        const trulyNewMatchesForUser = matchedJobs.filter(job => 
+          newlyAddedUserJobs && newlyAddedUserJobs.some(uj => uj.job_id === job.id)
+        );
+
+        if (trulyNewMatchesForUser.length === 0) {
+          continue; // No new alerts for this specific user in this run
+        }
+
+        console.log(`[Cron] Found ${trulyNewMatchesForUser.length} new matches for user ${pref.user_id}`);
 
         // Notifications
-        // We need the user's email.
-        // Option A: Use `supabaseAdmin.auth.admin.getUserById`
         let email = null;
         try {
             const { data: { user } } = await supabaseAdmin.auth.admin.getUserById(pref.user_id);
@@ -125,11 +125,11 @@ async function runDailyFetch() {
         }
 
         if (pref.email_enabled && email) {
-          await emailService.sendDailySummary(email, matchedJobs);
+          await emailService.sendDailySummary(email, trulyNewMatchesForUser);
         }
 
         if (pref.telegram_enabled && pref.telegram_chat_id) {
-          await telegramService.sendDailySummary(pref.telegram_chat_id, matchedJobs);
+          await telegramService.sendDailySummary(pref.telegram_chat_id, trulyNewMatchesForUser);
         }
       }
     }
@@ -138,7 +138,7 @@ async function runDailyFetch() {
     await supabaseAdmin.from('fetch_logs').insert({
       status: 'success',
       jobs_fetched: allRawJobs.length,
-      jobs_inserted: newJobs.length,
+      jobs_inserted: recentJobs.length,
       sources: fetchers.map(f => f.sourceName),
       completed_at: new Date().toISOString()
     });
