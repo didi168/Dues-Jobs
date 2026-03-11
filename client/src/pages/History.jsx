@@ -1,8 +1,14 @@
 import { useEffect, useState } from 'react';
 import { apiRequest } from '../services/api';
+import { usePageMeta } from '../hooks/usePageMeta';
 import JobCard from '../components/jobs/JobCard';
 
 export default function History() {
+  usePageMeta(
+    'Job History',
+    'View your job application history. Track jobs you have applied to or ignored.',
+    'job history, applied jobs, ignored jobs, job tracking'
+  );
   const [jobs, setJobs] = useState([]);
   const [filter, setFilter] = useState('applied');
   const [loading, setLoading] = useState(true);
@@ -11,8 +17,10 @@ export default function History() {
     setLoading(true);
     try {
       const params = new URLSearchParams({ status: filter });
-      const { data } = await apiRequest(`/api/v1/jobs?${params.toString()}`);
-      setJobs(data);
+      const response = await apiRequest(`/api/v1/jobs?${params.toString()}`);
+      // Backend returns { data: jobs, page, limit }
+      const jobsData = response.data || [];
+      setJobs(jobsData);
     } catch (err) {
       console.error(err);
     } finally {

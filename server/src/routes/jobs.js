@@ -18,16 +18,18 @@ router.get('/', async (req, res) => {
   try {
     // We want jobs from 'user_jobs' joined with 'jobs'.
     // Supabase can do this:
+    let selectString = source ? '*, job:jobs!inner(*)' : '*, job:jobs(*)';
     let query = supabaseAdmin
       .from('user_jobs')
-      .select('*, job:jobs(*)')
+      .select(selectString)
       .eq('user_id', req.user.id);
 
     if (days && !isNaN(parseInt(days))) {
       const msPerDay = 24 * 60 * 60 * 1000;
       const daysCount = parseInt(days);
       const cutoffDate = new Date(Date.now() - (daysCount * msPerDay));
-      query = query.gte('created_at', cutoffDate.toISOString());
+      // Filter by job posted_at, not user_jobs created_at
+      query = query.gte('job.posted_at', cutoffDate.toISOString());
     }
 
     if (status) {
@@ -37,8 +39,7 @@ router.get('/', async (req, res) => {
     // Keyword/Source filtering needs to be applied to the joined 'job' table?
     // Supabase filtering on joined tables: 'jobs.source'
     if (source) {
-      query = query.eq('jobs.source', source); // Wait, this syntax is tricky in supabase-js, likely !inner join needed
-      // Actually, standard select syntax: select('*, jobs!inner(*)') to filter on inner.
+      query = query.eq('job.source', source); // Use inner join on the alias 'job'
     }
 
     // Let's use simple pagination on user_jobs first

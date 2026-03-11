@@ -1,14 +1,21 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthProvider';
 import { useNavigate, Link } from 'react-router-dom';
-import { Briefcase } from 'lucide-react';
+import { Briefcase, Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { usePageMeta } from '../hooks/usePageMeta';
+import '../styles/auth.css';
 
 export default function Login() {
-  const { signIn, signUp } = useAuth();
+  usePageMeta(
+    'Sign In',
+    'Sign in to your DuesJobs account and continue your job search. Access personalized job recommendations.',
+    'login, sign in, job search, remote jobs'
+  );
+  const { signIn } = useAuth();
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -18,17 +25,9 @@ export default function Login() {
     setLoading(true);
 
     try {
-      if (isLogin) {
-        const { error } = await signIn(email, password);
-        if (error) throw error;
-        navigate('/dashboard');
-      } else {
-        const { error } = await signUp(email, password);
-        if (error) throw error;
-        // On success signup, usually redirected or need to confirm email.
-        // Assuming auto-confirm for mock/local, or prompt user.
-        alert('Check your email for confirmation link!');
-      }
+      const { error } = await signIn(email, password);
+      if (error) throw error;
+      navigate('/dashboard');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -37,76 +36,117 @@ export default function Login() {
   };
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center', 
-      background: 'var(--bg-body)',
-      backgroundImage: 'radial-gradient(circle at 10% 20%, rgba(62, 207, 142, 0.05) 0%, transparent 20%), radial-gradient(circle at 90% 80%, rgba(62, 207, 142, 0.05) 0%, transparent 20%)'
-    }}>
-      <div className="card" style={{ width: '100%', maxWidth: '420px', padding: '2.5rem', boxShadow: 'var(--shadow-md)', border: '1px solid var(--border)' }}>
-        
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
-           <div style={{ background: 'rgba(62, 207, 142, 0.1)', padding: '12px', borderRadius: '16px' }}>
-              <Briefcase size={32} color="var(--brand)" />
-           </div>
+    <div className="auth-container">
+      <div className="auth-background">
+        <div className="gradient-blob blob-1"></div>
+        <div className="gradient-blob blob-2"></div>
+        <div className="gradient-blob blob-3"></div>
+      </div>
+
+      <div className="auth-content">
+        <div className="auth-card login-card">
+          {/* Header */}
+          <div className="auth-header fade-in">
+            <div className="auth-logo">
+              <Briefcase size={40} color="var(--brand)" />
+            </div>
+            <h1>Welcome Back</h1>
+            <p className="text-muted">Sign in to your account and continue your job search</p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="auth-form slide-up">
+            {error && (
+              <div className="error-message shake-animation">
+                <span>⚠️ {error}</span>
+              </div>
+            )}
+
+            <div className="form-group">
+              <label className="form-label">Email Address</label>
+              <div className="input-wrapper">
+                <Mail size={18} className="input-icon" />
+                <input
+                  type="email"
+                  className="form-input"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                  placeholder="you@example.com"
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Password</label>
+              <div className="input-wrapper">
+                <Lock size={18} className="input-icon" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  className="form-input"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="input-icon-button"
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary btn-login"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="spinner"></span>
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  Sign In
+                  <ArrowRight size={18} />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Footer */}
+          <div className="auth-footer fade-in">
+            <p className="text-muted text-sm">
+              Don't have an account?{' '}
+              <Link to="/signup" className="auth-link">
+                Create one
+              </Link>
+            </p>
+          </div>
         </div>
 
-        <h1 style={{ marginBottom: '0.5rem', textAlign: 'center', fontSize: '1.75rem' }}>
-          {isLogin ? 'Welcome Back' : 'Create Account'}
-        </h1>
-        <p className="text-muted text-sm" style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          {isLogin ? 'Sign in to access your dashboard' : 'Join DuesJobs to find your next role'}
-        </p>
-        
-        {error && <div className="text-danger" style={{ marginBottom: '1rem', fontSize: '0.9rem', textAlign: 'center' }}>{error}</div>}
-
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div className="form-group" style={{ marginBottom: 0 }}>
-            <label className="form-label">Email Address</label>
-            <input 
-              type="email" 
-              className="form-input"
-              value={email} 
-              onChange={e => setEmail(e.target.value)} 
-              required 
-              placeholder="you@example.com"
-            />
+        {/* Side Info */}
+        <div className="auth-info fade-in">
+          <div className="info-card">
+            <div className="info-icon">🎯</div>
+            <h3>Find Your Perfect Role</h3>
+            <p>Discover job opportunities that match your skills and preferences</p>
           </div>
-          <div className="form-group" style={{ marginBottom: '0.5rem' }}>
-            <label className="form-label">Password</label>
-            <input 
-              type="password" 
-              className="form-input"
-              value={password} 
-              onChange={e => setPassword(e.target.value)} 
-              required 
-              placeholder="••••••••"
-            />
+          <div className="info-card">
+            <div className="info-icon">⚡</div>
+            <h3>Smart Matching</h3>
+            <p>Our AI matches jobs to your profile automatically</p>
           </div>
-
-          <button 
-            type="submit" 
-            className="btn btn-primary" 
-            disabled={loading}
-            style={{ width: '100%', marginTop: '1rem' }}
-          >
-            {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Sign Up')}
-          </button>
-        </form>
-
-        <div style={{ textAlign: 'center', marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border)' }}>
-          <span className="text-muted text-sm">
-            {isLogin ? "Don't have an account? " : "Already have an account? "}
-          </span>
-          <button 
-            className="btn-ghost"
-            style={{ padding: '0 0.25rem', color: 'var(--text-primary)' }}
-            onClick={() => setIsLogin(!isLogin)}
-          >
-            {isLogin ? 'Sign Up' : 'Sign In'}
-          </button>
+          <div className="info-card">
+            <div className="info-icon">🔔</div>
+            <h3>Instant Alerts</h3>
+            <p>Get notified about new opportunities via email or Telegram</p>
+          </div>
         </div>
       </div>
     </div>

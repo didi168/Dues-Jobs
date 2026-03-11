@@ -1,12 +1,76 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.jpg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>client</title>
+    <meta name="description" content="DuesJobs - AI-powered job matching platform. Find remote jobs tailored to your skills and preferences. Get personalized job recommendations delivered daily." />
+    <meta name="keywords" content="remote jobs, job search, career, job matching, AI jobs, remote work, job recommendations" />
+    <meta name="author" content="DuesJobs" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://dues-jobs.com/" />
+    <meta property="og:title" content="DuesJobs - AI-Powered Job Matching Platform" />
+    <meta property="og:description" content="Find remote jobs tailored to your skills. Get personalized job recommendations delivered daily." />
+    <meta property="og:image" content="https://dues-jobs.com/og-image.png" />
+    <meta property="og:site_name" content="DuesJobs" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://dues-jobs.com/" />
+    <meta property="twitter:title" content="DuesJobs - AI-Powered Job Matching Platform" />
+    <meta property="twitter:description" content="Find remote jobs tailored to your skills. Get personalized job recommendations delivered daily." />
+    <meta property="twitter:image" content="https://dues-jobs.com/og-image.png" />
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#3ecf8e" />
+    <meta name="msapplication-TileColor" content="#3ecf8e" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://dues-jobs.com/" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/vite.jpg" />
+    <link rel="apple-touch-icon" href="/vite.jpg" />
+    
+    <!-- Preconnect to external resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <title>DuesJobs - AI-Powered Remote Job Matching Platform</title>
+    
+    <style>
+      html[data-theme="dark"] {
+        --bg-body: #0d1117; 
+        --bg-card: #161b22;
+        --bg-sidebar: #0d1117;
+        --bg-input: #0d1117;
+        --bg-hover: #21262d;
+        
+        --text-primary: #f0f6fc;
+        --text-secondary: #8b949e;
+        --text-muted: #484f58;
+        
+        --border: rgba(240, 246, 252, 0.1);
+        --border-strong: rgba(240, 246, 252, 0.15);
+        
+        --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+        --shadow-md: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+        --glass-bg: rgba(22, 27, 34, 0.7);
+        --glass-border: rgba(240, 246, 252, 0.1);
+
+        --gradient-base: radial-gradient(circle at top left, #161b22, #0d1117);
+      }
+      
+      body {
+        background: var(--bg-body, #0d1117);
+        color: var(--text-primary, #f0f6fc);
+      }
+    </style>
   </head>
-  <body>
+  <body data-theme="dark">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

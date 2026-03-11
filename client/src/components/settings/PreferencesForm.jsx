@@ -16,14 +16,15 @@ export default function PreferencesForm() {
 
   useEffect(() => {
     apiRequest('/api/v1/users/me/preferences')
-      .then(({ message, ...data }) => { // Handle backend potentially wrapping in 'data' or flat
-         // Flatten data manually if needed based on API response
+      .then(({ message, ...data }) => {
+         // Set default sources if not provided
+         const defaultSources = ['Remotive', 'RemoteOK'];
          setFormData({
             keywords: (data.keywords || []).join(', '),
             locations: (data.locations || []).join(', '),
             remote_only: !!data.remote_only,
-            sources: data.sources || [],
-            email_enabled: !!data.email_enabled,
+            sources: data.sources && data.sources.length > 0 ? data.sources : defaultSources,
+            email_enabled: data.email_enabled !== false,
             telegram_enabled: !!data.telegram_enabled,
             telegram_chat_id: data.telegram_chat_id || '',
          });

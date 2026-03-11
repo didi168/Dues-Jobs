@@ -2,26 +2,30 @@
 node_modules/
 pnpm-lock.yaml
 yarn-error.log
+package-lock.json
 
 # Environment variables
-*.env
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+.env.*.local
 dev.env
 prod.env
+*.env
 
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
 # Runtime data
-pids
+pids/
 *.pid
 *.seed
 *.pid.lock
@@ -29,22 +33,70 @@ pids
 # Coverage
 coverage/
 *.lcov
-.nyc_output
+.nyc_output/
 
-# Build
+# Build & Distribution
 dist/
 build/
+*.tsbuildinfo
 
-# Misc
+# OS files
 .DS_Store
-*.pem
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Editor directories
-.vscode/*
+# IDE & Editor
+.vscode/
 !.vscode/extensions.json
-.idea
+.idea/
+.idea_modules/
+*.sublime-workspace
+*.sublime-project
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.vscode-test
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+
+# Editor temp files
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.iml
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Misc
+.cache/
+.parcel-cache/
+.next/
+out/
+.nuxt/
+dist/
+.cache/
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+.vscode-test
+.yarn/cache
+.yarn/unplugged
+tmp/
+temp/

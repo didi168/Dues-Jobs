@@ -20,16 +20,59 @@ export async function apiRequest(endpoint, options = {}) {
   };
 
   const baseUrl = import.meta.env.VITE_BACKEND_URL || '';
-  const response = await fetch(`${baseUrl}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  const url = `${baseUrl}${endpoint}`;
+  
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers,
+    });
 
-  if (!response.ok) {
-    // specialized error handling or just throw
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || `API Error: ${response.status}`);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      const errorMessage = errorData.error || errorData.details || `API Error: ${response.status}`;
+      throw new Error(errorMessage);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error(`API Request failed: ${endpoint}`, error);
+    throw error;
+  }
+}
+
+/**
+ * Helper to trigger the backend fetch/scraper job.
+ * Uses CRON_SECRET instead of JWT authentication.
+ */
+export async function triggerFetch() {
+  const cronSecret = import.meta.env.VITE_CRON_SECRET;
+  
+  if (!cronSecret) {
+    throw new Error('CRON_SECRET not configured in environment');
   }
 
-  return response.json();
+  const baseUrl = import.meta.env.VITE_BACKEND_URL || '';
+  const url = `${baseUrl}/api/v1/fetch/run`;
+  
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-cron-secret': cronSecret,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      const errorMessage = errorData.error || errorData.details || `API Error: ${response.status}`;
+      throw new Error(errorMessage);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Fetch trigger failed:', error);
+    throw error;
+  }
 }

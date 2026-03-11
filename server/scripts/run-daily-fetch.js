@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const { supabaseAdmin } = require('../src/services/supabase');
 const fetchers = require('../src/fetchers');
 const JobNormalizer = require('../src/services/JobNormalizer');
@@ -78,6 +78,20 @@ async function runDailyFetch() {
 
     console.log(`[Cron] Processing matches for ${userPrefs.length} users...`);
 
+    // Bulk fetch users for email mapping to avoid N+1 queries
+    let userEmailMap = {};
+    try {
+      const { data: { users }, error: authError } = await supabaseAdmin.auth.admin.listUsers();
+      if (!authError && users) {
+        userEmailMap = users.reduce((acc, u) => {
+          acc[u.id] = u.email;
+          return acc;
+        }, {});
+      }
+    } catch (e) {
+      console.warn('[Cron] Could not bulk fetch users emails, will fallback to individual fetching.');
+    }
+
     for (const pref of userPrefs) {
       // We now match against ALL recent jobs in the database
       const matchedJobs = JobMatcher.match(pref, currentRecentJobs);
@@ -116,12 +130,14 @@ async function runDailyFetch() {
         console.log(`[Cron] Found ${trulyNewMatchesForUser.length} new matches for user ${pref.user_id}`);
 
         // Notifications
-        let email = null;
-        try {
-            const { data: { user } } = await supabaseAdmin.auth.admin.getUserById(pref.user_id);
-            email = user?.email;
-        } catch (e) {
-            console.error(`[Cron] Could not fetch email for user ${pref.user_id}`);
+        let email = userEmailMap[pref.user_id];
+        if (!email) {
+          try {
+              const { data: { user } } = await supabaseAdmin.auth.admin.getUserById(pref.user_id);
+              email = user?.email;
+          } catch (e) {
+              console.error(`[Cron] Could not fetch email for user ${pref.user_id}`);
+          }
         }
 
         if (pref.email_enabled && email) {
@@ -152,7 +168,12 @@ async function runDailyFetch() {
       details: error.message,
       completed_at: new Date().toISOString()
     });
-    process.exit(1);
+    
+    if (require.main === module) {
+      process.exit(1);
+    } else {
+      throw error;
+    }
   }
 }
 

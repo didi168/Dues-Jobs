@@ -5,7 +5,7 @@ export default function ProtectedRoute() {
   const { user, loading } = useAuth();
   
   if (loading) {
-    return <div className="loading-spinner">Loading...</div>; // Or a proper spinner
+    return <div className="loading-spinner">Loading...</div>;
   }
 
   if (!user) {

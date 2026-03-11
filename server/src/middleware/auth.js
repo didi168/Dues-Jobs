@@ -9,13 +9,13 @@ const authenticateUser = async (req, res, next) => {
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
   if (!authHeader) {
-    if (req.accepts('html')) return res.redirect(frontendUrl);
+    if (req.accepts('html') && !req.originalUrl.startsWith('/api')) return res.redirect(frontendUrl);
     return res.status(401).json({ error: 'Missing authorization header' });
   }
 
   const token = authHeader.split(' ')[1];
   if (!token) {
-    if (req.accepts('html')) return res.redirect(frontendUrl);
+    if (req.accepts('html') && !req.originalUrl.startsWith('/api')) return res.redirect(frontendUrl);
     return res.status(401).json({ error: 'Invalid token format' });
   }
 
@@ -23,7 +23,7 @@ const authenticateUser = async (req, res, next) => {
     const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
 
     if (error || !user) {
-      if (req.accepts('html')) return res.redirect(frontendUrl);
+      if (req.accepts('html') && !req.originalUrl.startsWith('/api')) return res.redirect(frontendUrl);
       return res.status(401).json({ error: 'Invalid token' });
     }
 
@@ -43,7 +43,7 @@ const authenticateUser = async (req, res, next) => {
 const requireCronSecret = (req, res, next) => {
   const secret = req.headers['cron_secret'] || req.headers['x-cron-secret'];
   if (secret !== process.env.CRON_SECRET) {
-    return res.status(403).json({ error: 'Forbidden: Invalid Cron Secret' });
+    return res.status(401).json({ error: 'Unauthorized' });
   }
   next();
 };

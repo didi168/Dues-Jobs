@@ -33,7 +33,13 @@ export default function AuthProvider({ children }) {
     user,
     loading,
     signIn: (email, password) => supabase.auth.signInWithPassword({ email, password }),
-    signUp: (email, password) => supabase.auth.signUp({ email, password }),
+    signUp: (email, password) => supabase.auth.signUp({ 
+      email, 
+      password,
+      options: {
+        emailRedirectTo: undefined, // Disable Supabase email verification
+      },
+    }),
     signOut: () => supabase.auth.signOut(),
   };
 

@@ -39,10 +39,12 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 // Routes
+const authRoutes = require('./routes/auth');
 const fetchRoutes = require('./routes/fetch');
 const jobsRoutes = require('./routes/jobs');
 const usersRoutes = require('./routes/users');
 
+app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/fetch', fetchRoutes);
 app.use('/api/v1/jobs', jobsRoutes);
 app.use('/api/v1/users', usersRoutes);
@@ -52,8 +54,11 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date() });
 });
 
-// 404 Handler - Redirect to Frontend
+// 404 Handler - Redirect to Frontend for non-api routes
 app.use((req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ error: 'Not Found' });
+  }
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
   res.redirect(frontendUrl);
 });
@@ -66,6 +71,24 @@ app.use((err, req, res, next) => {
 
 
 const telegramBot = require('./services/TelegramBotHandler');
+
+const required = [
+  'SUPABASE_URL',
+  'SUPABASE_SERVICE_ROLE_KEY',
+  'SUPABASE_ANON_KEY',
+  'CRON_SECRET',
+  'SMTP_HOST',
+  'SMTP_PORT',
+  'SMTP_USER',
+  'SMTP_PASS',
+  'EMAIL_FROM'
+];
+
+const missing = required.filter(key => !process.env[key]);
+if (missing.length) {
+  console.error('Missing env vars:', missing.join(', '));
+  process.exit(1);
+}
 
 app.listen(PORT, () => {
   const serverUrl = process.env.BACKEND_URL || `http://localhost:${PORT}`;

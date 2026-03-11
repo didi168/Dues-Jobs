@@ -20,7 +20,8 @@ router.get('/me/preferences', async (req, res) => {
       throw error;
     }
 
-    res.json(data || {}); // Return empty obj if no prefs found (or default)
+    // Return preferences if they exist, otherwise return empty object
+    res.json(data || {});
 
   } catch (err) {
     console.error('Get Prefs Error:', err);

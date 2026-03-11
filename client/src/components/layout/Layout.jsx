@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthProvider';
-import { useTheme } from '../../contexts/ThemeProvider';
-import { LayoutDashboard, History, Settings, LogOut, Menu, X, Briefcase, Moon, Sun } from 'lucide-react';
+import { LayoutDashboard, History, Settings, LogOut, Menu, X, Briefcase } from 'lucide-react';
 
 export default function Layout() {
   const { signOut, user } = useAuth();
@@ -19,8 +18,6 @@ export default function Layout() {
     { path: '/settings', label: 'Settings', icon: Settings },
   ];
 
-  const { theme, toggleTheme } = useTheme();
-
   return (
     <div className="app-container">
       
@@ -32,9 +29,6 @@ export default function Layout() {
            </button>
            <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>DuesJobs</div>
         </div>
-        <button onClick={toggleTheme} className="btn btn-ghost">
-            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-        </button>
       </header>
       
       {/* Sidebar Overlay (Mobile) */}
@@ -72,11 +66,6 @@ export default function Layout() {
         </nav>
 
         <div style={{ marginTop: 'auto', borderTop: '1px solid var(--border)', paddingTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          
-          <button onClick={toggleTheme} className="nav-link" style={{ justifyContent: 'flex-start', color: 'var(--text-secondary)' }}>
-             {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-             <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
-          </button>
           
           <div className="text-xs text-muted" style={{ paddingLeft: '0.75rem', marginTop: '0.5rem' }}>
             {user?.email}
