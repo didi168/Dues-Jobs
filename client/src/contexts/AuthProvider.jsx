@@ -32,7 +32,21 @@ export default function AuthProvider({ children }) {
     session,
     user,
     loading,
-    signIn: (email, password) => supabase.auth.signInWithPassword({ email, password }),
+    signIn: async (email, password) => {
+      try {
+        console.log('[Auth] Attempting sign in with email:', email);
+        const result = await supabase.auth.signInWithPassword({ email, password });
+        if (result.error) {
+          console.error('[Auth] Sign in error:', result.error);
+        } else {
+          console.log('[Auth] Sign in successful');
+        }
+        return result;
+      } catch (err) {
+        console.error('[Auth] Sign in exception:', err);
+        throw err;
+      }
+    },
     signUp: (email, password) => supabase.auth.signUp({ 
       email, 
       password,
