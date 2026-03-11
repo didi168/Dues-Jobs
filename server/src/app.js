@@ -19,20 +19,34 @@ app.use(helmet());
 
 const whitelist = [
   'http://localhost:5173',
-  'https://dues-jobs.vercel.app'
+  'https://dues-jobs-client.vercel.app'
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
     // allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    if (whitelist.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+    
+    // Check if origin is in whitelist
+    const isWhitelisted = whitelist.some(allowed => {
+      if (allowed.includes('*')) {
+        // Handle wildcard domains
+        const pattern = allowed.replace('*', '.*');
+        return new RegExp(pattern).test(origin);
+      }
+      return allowed === origin;
+    });
+    
+    if (isWhitelisted || process.env.NODE_ENV !== 'production') {
       callback(null, true);
     } else {
+      console.warn(`CORS blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-cron-secret'],
 }));
 
 app.use(morgan('dev'));
